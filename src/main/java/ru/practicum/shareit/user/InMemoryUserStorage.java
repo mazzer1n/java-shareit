@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.HashMap;
 
 @Repository
-@RequiredArgsConstructor
 public class InMemoryUserStorage implements UserStorage {
     private final HashMap<Integer, User> users = new HashMap<>();
     private static int userId = 0;

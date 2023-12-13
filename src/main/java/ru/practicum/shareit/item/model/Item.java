@@ -1,15 +1,14 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Builder;
+import lombok.*;
 import ru.practicum.shareit.request.ItemRequest;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-@Data
+@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class Item {

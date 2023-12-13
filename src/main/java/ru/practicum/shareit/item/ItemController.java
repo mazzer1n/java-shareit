@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-import javax.validation.Valid;
 import java.util.Collection;
 
 @RestController
@@ -16,7 +15,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto add(@RequestHeader("X-Sharer-User-Id") Integer userId, @Valid @RequestBody ItemDto dto) {
+    public ItemDto add(@RequestHeader("X-Sharer-User-Id") Integer userId, @RequestBody ItemDto dto) {
         ItemDto itemDto = itemService.add(userId, dto);
         log.info("Create item by userId={} item={}", userId, itemDto);
         return itemDto;
@@ -25,7 +24,7 @@ public class ItemController {
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader("X-Sharer-User-Id") Integer userId,
                        @PathVariable Integer itemId,
-                       @Valid @RequestBody ItemDto dto) {
+                       @RequestBody ItemDto dto) {
         ItemDto itemDto = itemService.update(userId, itemId, dto);
         log.info("Update item by userId={} item={}", userId, itemDto);
         return itemDto;

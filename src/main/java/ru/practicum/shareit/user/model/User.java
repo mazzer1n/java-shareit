@@ -1,12 +1,13 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
-@Data
+@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 @AllArgsConstructor
 public class User {
     private Integer id;
