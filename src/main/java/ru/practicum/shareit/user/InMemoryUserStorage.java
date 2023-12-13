@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.AlreadyExistException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -83,16 +82,21 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(dto.getName());
         }
 
-        for (User value : users.values()) {
-            if (value.getEmail().equals(dto.getEmail()) && !value.getId().equals(user.getId())) {
-                throw new AlreadyExistException(
-                        "Пользователь с электронным адресом " + dto.getEmail() + " уже существует."
-                );
-            }
+        String newEmail = dto.getEmail();
+        if (newEmail != null && emailExists(newEmail, user.getId())) {
+            throw new AlreadyExistException(
+                    "Пользователь с электронным адресом " + newEmail + " уже существует."
+            );
         }
 
-        if (dto.getEmail() != null) {
-            user.setEmail(dto.getEmail());
+        if (newEmail != null) {
+            user.setEmail(newEmail);
         }
     }
+
+    private boolean emailExists(String newEmail, Integer userId) {
+        return users.values().stream()
+                .anyMatch(value -> value.getEmail().equals(newEmail) && !value.getId().equals(userId));
+    }
+
 }
