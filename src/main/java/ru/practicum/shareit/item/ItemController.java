@@ -2,8 +2,10 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.group.*;
 
 import java.util.Collection;
 
@@ -11,10 +13,12 @@ import java.util.Collection;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
+    @Validated(Marker.OnCreate.class)
     public ItemDto add(@RequestHeader("X-Sharer-User-Id") Integer userId, @RequestBody ItemDto dto) {
         ItemDto itemDto = itemService.add(userId, dto);
         log.info("Create item by userId={} item={}", userId, itemDto);
@@ -22,9 +26,10 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
+    @Validated(Marker.OnUpdate.class)
     public ItemDto update(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                       @PathVariable Integer itemId,
-                       @RequestBody ItemDto dto) {
+                          @PathVariable Integer itemId,
+                          @RequestBody ItemDto dto) {
         ItemDto itemDto = itemService.update(userId, itemId, dto);
         log.info("Update item by userId={} item={}", userId, itemDto);
         return itemDto;
@@ -32,8 +37,8 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemDto get(@RequestHeader("X-Sharer-User-Id") Integer userId, @PathVariable Integer itemId) {
-        ItemDto itemDto = itemService.get(userId,itemId);
-        log.info("Create item by userId={} item={}", userId, itemDto);
+        ItemDto itemDto = itemService.get(userId, itemId);
+        log.info("Get item by userId={} item={}", userId, itemDto);
         return itemDto;
     }
 

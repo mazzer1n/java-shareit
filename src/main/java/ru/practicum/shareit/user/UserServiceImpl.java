@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean delete(int id) {
-        return userStorage.delete(id);
+    public void delete(int id) {
+        userStorage.delete(id);
     }
 }

@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User update(Integer id, UserDto dto) {
-        User user = get(id);
+        User user = users.get(id);
         updateUserData(user, dto);
         users.put(user.getId(), user);
 
@@ -54,11 +54,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean delete(int id) {
-        get(id);
+    public void delete(int id) {
         users.remove(id);
-
-        return true;
     }
 
     private void validateEmailAlreadyExist(UserDto userDto) {
