@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import ru.practicum.shareit.group.Marker;
 
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class UserDto {
     @NotNull(groups = Marker.OnUpdate.class)
     private long id;
