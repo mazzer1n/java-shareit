@@ -99,19 +99,12 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemDto> search(Long userId, String text) {
-        if (text == null || text.isBlank()) {
-            return new ArrayList<>();
-        }
-
-        List<ItemDto> result = new ArrayList<>();
-        List<Item> foundItems = itemRepository.search(text);
-
-        for (Item foundItem : foundItems) {
-            result.add(fillItemWithCommentsAndBookings(foundItem));
-        }
-
-        return result;
+        return itemRepository.search(text)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
+
 
     @Transactional
     @Override

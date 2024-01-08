@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "bookings")
+@EqualsAndHashCode(of = "id")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
