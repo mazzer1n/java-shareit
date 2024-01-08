@@ -4,55 +4,69 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.group.Marker;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.group.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
-@Validated
 public class ItemController {
     private final ItemService itemService;
 
-    @PostMapping
     @Validated(Marker.OnCreate.class)
-    public ItemDto add(@RequestHeader("X-Sharer-User-Id") Integer userId, @RequestBody ItemDto dto) {
-        ItemDto itemDto = itemService.add(userId, dto);
-        log.info("Create item by userId={} item={}", userId, itemDto);
+    @PostMapping
+    public ItemDto save(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto dto) {
+        ItemDto itemDto = itemService.save(userId, dto);
+        log.info("Item saved: {}", dto);
         return itemDto;
     }
 
-    @PatchMapping("/{itemId}")
+    @Validated(Marker.OnCreate.class)
+    @PostMapping("/{itemId}/comment")
+    public CommentDto save(@RequestHeader("X-Sharer-User-Id") Long userId,
+                           @PathVariable Long itemId,
+                           @RequestBody CommentDto dto) {
+        CommentDto commentDto = itemService.saveComment(userId, itemId, dto);
+        log.info("Comment saved: {}", commentDto);
+        return commentDto;
+    }
+
     @Validated(Marker.OnUpdate.class)
-    public ItemDto update(@RequestHeader("X-Sharer-User-Id") Integer userId,
-                          @PathVariable Integer itemId,
+    @PatchMapping("/{itemId}")
+    public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
+                          @PathVariable Long itemId,
                           @RequestBody ItemDto dto) {
         ItemDto itemDto = itemService.update(userId, itemId, dto);
-        log.info("Update item by userId={} item={}", userId, itemDto);
+        log.info("Item updated: {}", itemDto);
         return itemDto;
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@RequestHeader("X-Sharer-User-Id") Integer userId, @PathVariable Integer itemId) {
-        ItemDto itemDto = itemService.get(userId, itemId);
-        log.info("Get item by userId={} item={}", userId, itemDto);
+    public ItemDto findById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable Long itemId) {
+        ItemDto itemDto = itemService.findById(userId, itemId);
+        log.info("Get item by id: {}", itemDto);
         return itemDto;
     }
 
     @GetMapping
-    public Collection<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id") Integer userId) {
-        Collection<ItemDto> itemsDto = itemService.getAll(userId);
-        log.info("Get items by userId={} size={}", userId, itemsDto.size());
-        return itemsDto;
+    public Collection<ItemDto> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        Collection<ItemDto> items = itemService.findAll(userId);
+        log.info("All items by user id: size - {}", items.size());
+        return items;
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> search(@RequestHeader("X-Sharer-User-Id") Integer userId, @RequestParam String text) {
-        Collection<ItemDto> itemsDto = itemService.search(userId, text);
-        log.info("Get items by userId={} size={}", userId, itemsDto.size());
-        return itemsDto;
+    public Collection<ItemDto> search(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
+        if (text == null || text.isBlank()) {
+            return new ArrayList<>();
+        }
+        Collection<ItemDto> items = itemService.search(userId, text);
+        log.info("{} found items", items.size());
+        return items;
     }
 }
