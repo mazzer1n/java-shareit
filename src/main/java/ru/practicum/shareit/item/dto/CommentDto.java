@@ -1,9 +1,11 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.*;
-import ru.practicum.shareit.group.Marker;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
@@ -11,9 +13,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentDto {
     private Long id;
-    @NotBlank(groups = Marker.OnCreate.class)
+    @NotEmpty
+    @NotNull
     private String text;
-    @NotBlank(groups = Marker.OnCreate.class)
     private String authorName;
     private LocalDateTime created;
 }

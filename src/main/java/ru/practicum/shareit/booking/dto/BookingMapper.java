@@ -9,32 +9,53 @@ import ru.practicum.shareit.user.model.User;
 public class BookingMapper {
     public static BookingDto toBookingDto(Booking booking) {
         return BookingDto.builder()
-                .id(booking.getId())
-                .start(booking.getStart())
-                .end(booking.getEnd())
-                .item(booking.getItem())
-                .booker(booking.getBooker())
-                .status(booking.getStatus())
-                .build();
+            .id(booking.getId())
+            .start(booking.getStart())
+            .end(booking.getEnd())
+            .item(booking.getItem())
+            .booker(booking.getBooker())
+            .status(booking.getStatus())
+            .build();
+    }
+
+    public static Booking toBookingFromBookingDto(BookingDto dto) {
+        return Booking.builder()
+            .id(dto.getId())
+            .start(dto.getStart())
+            .end(dto.getEnd())
+            .item(dto.getItem())
+            .booker(dto.getBooker())
+            .status(dto.getStatus())
+            .build();
     }
 
     public static Booking toBooking(ShortBookingDto dto, Item item, User booker) {
         return Booking.builder()
-                .start(dto.getStart())
-                .end(dto.getEnd())
-                .id(dto.getId())
-                .booker(booker)
-                .item(item)
-                .build();
+            .start(dto.getStart())
+            .end(dto.getEnd())
+            .id(dto.getId())
+            .booker(booker)
+            .item(item)
+            .build();
     }
 
     public static ShortBookingDto toShortBookingDto(Booking booking) {
         return ShortBookingDto.builder()
-                .id(booking.getId())
-                .start(booking.getStart())
-                .end(booking.getEnd())
-                .itemId(booking.getItem().getId())
-                .bookerId(booking.getBooker().getId())
-                .build();
+            .id(booking.getId())
+            .start(booking.getStart())
+            .end(booking.getEnd())
+            .itemId(booking.getItem().getId())
+            .bookerId(booking.getBooker().getId())
+            .build();
+    }
+
+    public static ShortBookingDto toShortBookingDto(BookingDto dto) {
+        return ShortBookingDto.builder()
+            .id(dto.getId())
+            .start(dto.getStart())
+            .end(dto.getEnd())
+            .itemId(dto.getItem().getId())
+            .bookerId(dto.getBooker().getId())
+            .build();
     }
 }
