@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS comments (
                                         item_id BIGINT NOT NULL,
                                         author_id BIGINT NOT NULL,
                                         created TIMESTAMP WITHOUT TIME ZONE,
-                                        CONSTRAINT pk_commet PRIMARY KEY (comment_id)
+                                        CONSTRAINT pk_comment PRIMARY KEY (comment_id)
 );
 
 ALTER TABLE items ADD CONSTRAINT fk_items_requests FOREIGN KEY (request_id) REFERENCES requests (request_id) ON DELETE CASCADE;
