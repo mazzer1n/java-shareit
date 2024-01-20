@@ -48,8 +48,6 @@ public class BookingServiceTest {
     private ItemServiceImpl itemService;
     @Mock
     private BookingRepository bookingRepository;
-    @Mock
-    private Validator startAndEndValidator;
     @InjectMocks
     private BookingServiceImpl bookingService;
     private long bookingId;
