@@ -7,6 +7,8 @@ import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -26,8 +28,8 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public CommentDto save(@RequestHeader("X-Sharer-User-Id") Long userId,
-        @PathVariable Long itemId,
-        @Valid @RequestBody CommentDto dto) {
+                           @PathVariable Long itemId,
+                           @Valid @RequestBody CommentDto dto) {
         CommentDto commentDto = itemService.saveComment(userId, itemId, dto);
         log.info("Comment saved: {}", commentDto);
         return commentDto;
@@ -35,8 +37,8 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
-        @PathVariable Long itemId,
-        @RequestBody ItemDto dto) {
+                          @PathVariable Long itemId,
+                          @RequestBody ItemDto dto) {
         ItemDto itemDto = itemService.update(userId, itemId, dto);
         log.info("Item updated: {}", itemDto);
         return itemDto;
@@ -51,8 +53,8 @@ public class ItemController {
 
     @GetMapping
     public Collection<ItemDto> findAll(@RequestHeader("X-Sharer-User-Id") Long userId,
-        @RequestParam(defaultValue = "0", required = false) Integer from,
-        @RequestParam(defaultValue = "10", required = false) Integer size) {
+                                       @PositiveOrZero @RequestParam(defaultValue = "0", required = false) Integer from,
+                                       @Positive @RequestParam(defaultValue = "10", required = false) Integer size) {
         Collection<ItemDto> items = itemService.findAll(userId, from, size);
         log.info("All items by user id: size - {}", items.size());
         return items;
@@ -60,9 +62,9 @@ public class ItemController {
 
     @GetMapping("/search")
     public Collection<ItemDto> search(@RequestHeader("X-Sharer-User-Id") Long userId,
-        @RequestParam String text,
-        @RequestParam(defaultValue = "0", required = false) Integer from,
-        @RequestParam(defaultValue = "10", required = false) Integer size) {
+                                      @RequestParam String text,
+                                      @PositiveOrZero @RequestParam(defaultValue = "0", required = false) Integer from,
+                                      @Positive @RequestParam(defaultValue = "10", required = false) Integer size) {
         if (text == null || text.isBlank()) {
             return new ArrayList<>();
         }

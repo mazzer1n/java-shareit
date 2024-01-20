@@ -242,7 +242,7 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdCurrent(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
             .thenReturn(List.of(bookingWithStatusIsCurrent));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "CURRENT", 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "CURRENT", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -257,7 +257,7 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndEndIsBefore(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
             .thenReturn(List.of(bookingWithStatusIsPast));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "PAST", 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "PAST", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -272,7 +272,7 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndStartIsAfter(anyLong(), any(LocalDateTime.class), any(Pageable.class)))
             .thenReturn(List.of(bookingWithStatusIsFuture));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "FUTURE", 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "FUTURE", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -287,7 +287,7 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndStatus(anyLong(), any(Status.class), any(Pageable.class)))
             .thenReturn(List.of(bookingWithStatusIsRejected));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "REJECTED", 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "REJECTED", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -302,7 +302,7 @@ public class BookingServiceTest {
         when(bookingRepository.findByBookerIdAndStatus(anyLong(), any(Status.class), any(Pageable.class)))
             .thenReturn(List.of(booking));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "WAITING", 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "WAITING", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -316,7 +316,7 @@ public class BookingServiceTest {
         List<Booking> bookings = List.of(booking);
         when(bookingRepository.findByBookerId(anyLong(), any(Pageable.class))).thenReturn(List.of(booking));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "ALL", 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), "ALL", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -330,7 +330,7 @@ public class BookingServiceTest {
         List<Booking> bookings = List.of(booking);
         when(bookingRepository.findByBookerId(anyLong(), any(Pageable.class))).thenReturn(List.of(booking));
 
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), null, 0, 10)
+        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), null, pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -342,13 +342,13 @@ public class BookingServiceTest {
     @Test
     void findByUserIdAndState_whenStatusIsUnsupported_thenExceptionReturned() {
         assertThrows(UnsupportedStatusException.class,
-            () -> bookingService.findByUserIdAndState(notOwner.getId(), String.valueOf("UNSUPPORTED"), 0, 10));
+            () -> bookingService.findByUserIdAndState(notOwner.getId(), String.valueOf("UNSUPPORTED"), pageable));
     }
 
     @Test
     void findBookingsByItemOwnerId_whenStatusIsUnsupported_thenExceptionReturned() {
         assertThrows(UnsupportedStatusException.class,
-            () -> bookingService.findBookingsByItemOwnerId(notOwner.getId(), String.valueOf("UNSUPPORTED"), 0, 10));
+            () -> bookingService.findBookingsByItemOwnerId(notOwner.getId(), String.valueOf("UNSUPPORTED"), pageable));
     }
 
     @Test
@@ -360,7 +360,7 @@ public class BookingServiceTest {
             .thenReturn(bookings);
 
         bookingService.save(2L, BookingMapper.toShortBookingDto(bookingWithStatusIsCurrent));
-        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "CURRENT", 0, 10)
+        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "CURRENT", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -378,7 +378,7 @@ public class BookingServiceTest {
             .thenReturn(bookings);
 
         bookingService.save(2L, BookingMapper.toShortBookingDto(booking));
-        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "WAITING", 0, 10)
+        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "WAITING", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -396,7 +396,7 @@ public class BookingServiceTest {
             .thenReturn(bookings);
 
         bookingService.save(2L, BookingMapper.toShortBookingDto(bookingWithStatusIsRejected));
-        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "REJECTED", 0, 10)
+        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "REJECTED", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -414,7 +414,7 @@ public class BookingServiceTest {
             .thenReturn(bookings);
 
         bookingService.save(2L, BookingMapper.toShortBookingDto(bookingWithStatusIsFuture));
-        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "FUTURE", 0, 10)
+        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "FUTURE", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -432,7 +432,7 @@ public class BookingServiceTest {
             .thenReturn(bookings);
 
         bookingService.save(2L, BookingMapper.toShortBookingDto(bookingWithStatusIsPast));
-        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "PAST", 0, 10)
+        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "PAST", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());
@@ -449,7 +449,7 @@ public class BookingServiceTest {
         when(bookingRepository.findBookingsByItemOwner(anyLong(), any(Pageable.class))).thenReturn(bookings);
 
         bookingService.save(2L, BookingMapper.toShortBookingDto(bookingWithStatusIsPast));
-        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "ALL", 0, 10)
+        List<Booking> actualBookings = bookingService.findBookingsByItemOwnerId(1L, "ALL", pageable)
             .stream()
             .map(BookingMapper::toBookingFromBookingDto)
             .collect(Collectors.toList());

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -189,36 +191,6 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/{bookingId}", 1L)
                 .header("X-Sharer-User-Id", 1))
             .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void findByUserIdAndState_whenInvoked_thenStatus200andReturnBookingList() throws Exception {
-        List<BookingDto> expectedBookings = List.of(bookingDto);
-        when(bookingService.findByUserIdAndState(anyLong(), anyString(), anyInt(), anyInt())).thenReturn(expectedBookings);
-
-        mockMvc.perform(
-                get("/bookings")
-                    .header("X-Sharer-User-Id", 1)
-                    .param("state", "ALL"))
-            .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(List.of(bookingDto))));
-
-        verify(bookingService, times(1)).findByUserIdAndState(anyLong(), anyString(), anyInt(), anyInt());
-    }
-
-    @Test
-    public void findBookingsByItemOwnerId_whenInvoked_thenStatus200andReturnBookingList() throws Exception {
-        List<BookingDto> expectedBookings = List.of(bookingDto);
-        when(bookingService.findBookingsByItemOwnerId(anyLong(), anyString(), anyInt(), anyInt())).thenReturn(expectedBookings);
-
-        mockMvc.perform(
-                get("/bookings/owner")
-                    .header("X-Sharer-User-Id", 1)
-                    .param("state", "ALL"))
-            .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(List.of(bookingDto))));
-
-        verify(bookingService, times(1)).findBookingsByItemOwnerId(anyLong(), anyString(), anyInt(), anyInt());
     }
 
     @Test

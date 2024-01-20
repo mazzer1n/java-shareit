@@ -3,15 +3,16 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.core.exception.exceptions.*;
-import ru.practicum.shareit.user.dto.*;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.Collection;
 
 import static java.util.stream.Collectors.toList;
-import static ru.practicum.shareit.user.dto.UserMapper.*;
+import static ru.practicum.shareit.user.dto.UserMapper.toUser;
+import static ru.practicum.shareit.user.dto.UserMapper.toUserDto;
 
 @Service
 @RequiredArgsConstructor
@@ -22,9 +23,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Collection<UserDto> findAll() {
         return userRepository.findAll()
-            .stream()
-            .map(UserMapper::toUserDto)
-            .collect(toList());
+                .stream()
+                .map(UserMapper::toUserDto)
+                .collect(toList());
     }
 
     @Transactional(readOnly = true)
@@ -58,9 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public User getExistingUser(long id) {
-        return userRepository.findById(id).orElseThrow(
-            () -> new UserNotFoundException("Пользователь с id " + id + " не найден.")
-        );
+        return userRepository.getExistingUser(id);
     }
 
     private void updateName(User user, String newName) {

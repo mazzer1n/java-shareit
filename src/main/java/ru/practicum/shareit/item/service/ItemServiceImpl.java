@@ -6,14 +6,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.core.exception.exceptions.*;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.*;
 import ru.practicum.shareit.item.storage.*;
 import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
@@ -29,24 +32,24 @@ import static ru.practicum.shareit.item.dto.ItemMapper.*;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
-    private final UserServiceImpl userServiceImpl;
-    private final BookingServiceImpl bookingServiceImpl;
-    private final ItemRequestServiceImpl requestService;
+    private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final ItemRequestRepository requestRepository;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, CommentRepository commentRepository, UserServiceImpl userServiceImpl,
-                           @Lazy BookingServiceImpl bookingServiceImpl, @Lazy ItemRequestServiceImpl requestService) {
+    public ItemServiceImpl(ItemRepository itemRepository, CommentRepository commentRepository, UserRepository userRepository,
+                           @Lazy BookingRepository bookingRepository, @Lazy ItemRequestRepository requestRepository) {
         this.itemRepository = itemRepository;
         this.commentRepository = commentRepository;
-        this.userServiceImpl = userServiceImpl;
-        this.bookingServiceImpl = bookingServiceImpl;
-        this.requestService = requestService;
+        this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.requestRepository = requestRepository;
     }
 
     @Transactional
     @Override
     public ItemDto save(Long userId, ItemDto dto) {
-        userServiceImpl.getExistingUser(userId);
+        userRepository.getExistingUser(userId);
 
         Item item = toItem(dto);
         item.setOwner(userId);
@@ -73,13 +76,13 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public ItemDto findById(Long userId, Long itemId) {
-        userServiceImpl.getExistingUser(userId);
+        userRepository.getExistingUser(userId);
         Item item = getExistingItem(itemId);
         ItemDto result = toItemDto(item);
         fillItemWithComments(result, itemId);
 
         if (item.getOwner().equals(userId)) {
-            bookingServiceImpl.fillItemWithBookings(result);
+            bookingRepository.fillItemWithBookings(result);
             return result;
         }
 
@@ -112,15 +115,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public Item getExistingItem(long id) {
-        return itemRepository.findById(id).orElseThrow(
-            () -> new ItemNotFoundException("Товар с id " + id + " не найден.")
-        );
+        return itemRepository.getExistingItem(id);
     }
 
     private void setRequestWhenCreateItem(Item item, ItemDto dto) {
         if (dto.getRequestId() != null) {
             Long requestId = dto.getRequestId();
-            ItemRequest request = requestService.getExistingRequest(requestId);
+            ItemRequest request = requestRepository.getExistingRequest(requestId);
             item.setRequest(request);
         }
     }
@@ -142,30 +143,25 @@ public class ItemServiceImpl implements ItemService {
     private ItemDto fillItemWithCommentsAndBookings(Item item) {
         ItemDto result = toItemDto(item);
         fillItemWithComments(result, item.getId());
-        bookingServiceImpl.fillItemWithBookings(result);
+        bookingRepository.fillItemWithBookings(result);
 
         return result;
     }
 
     public List<ItemDtoInRequest> getItemsByRequestId(long id) {
-        return itemRepository.findByRequestId(id)
-            .stream().map(ItemMapper::toItemDtoInRequest)
-            .collect(Collectors.toList());
+        return itemRepository.getItemsByRequestId(id);
     }
 
     public boolean hasUserZeroItems(long userId) {
-        return itemRepository.findAll()
-            .stream()
-            .filter(item -> item.getOwner().equals(userId))
-            .findAny().isEmpty();
+        return itemRepository.hasUserZeroItems(userId);
     }
 
     @Transactional
     @Override
     public CommentDto saveComment(Long userId, Long itemId, CommentDto dto) {
-        User user = userServiceImpl.getExistingUser(userId);
+        User user = userRepository.getExistingUser(userId);
         Item item = getExistingItem(itemId);
-        bookingServiceImpl.validateBookingsToAddComment(userId, itemId);
+        bookingRepository.validateBookingsToAddComment(userId, itemId);
 
         Comment comment = toComment(dto);
         comment.setCreated(LocalDateTime.now());

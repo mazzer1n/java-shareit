@@ -6,15 +6,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.core.exception.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.core.validation.PaginationValidator;
 import ru.practicum.shareit.item.dto.ItemDtoInRequest;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.request.dto.*;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserServiceImpl;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,14 +27,14 @@ import static ru.practicum.shareit.request.dto.RequestMapper.*;
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
-    private final UserServiceImpl userServiceImpl;
-    private final ItemServiceImpl itemServiceImpl;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
     public static final Sort SORT = Sort.by("created").descending();
 
     @Transactional
     @Override
     public ItemRequestDto save(Long userId, ItemRequestDto dto) {
-        User user = userServiceImpl.getExistingUser(userId);
+        User user = userRepository.getExistingUser(userId);
 
         ItemRequest request = toRequest(dto);
         request.setRequester(user);
@@ -48,7 +47,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public ItemRequestDto findById(Long userId, Long requestId) {
-        userServiceImpl.getExistingUser(userId);
+        userRepository.getExistingUser(userId);
         ItemRequest request = getExistingRequest(requestId);
         ItemRequestDto result = toRequestDto(request);
         fillRequestsWithItems(result);
@@ -59,7 +58,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemRequestDto> findAll(Long userId) {
-        userServiceImpl.getExistingUser(userId);
+        userRepository.getExistingUser(userId);
         List<ItemRequest> requests = requestRepository.findByRequesterId(userId, SORT);
 
         return mapListToDtoList(requests);
@@ -69,7 +68,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public Collection<ItemRequestDto> findAllFromOtherUsers(Long userId, Integer from, Integer size) {
         PaginationValidator.validatePagination(from, size);
-        userServiceImpl.getExistingUser(userId);
+        userRepository.getExistingUser(userId);
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         List<ItemRequest> requests = requestRepository.findByRequesterIdIsNot(userId, pageable);
 
@@ -89,13 +88,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     public ItemRequest getExistingRequest(long id) {
-        return requestRepository.findById(id).orElseThrow(
-            () -> new RequestNotFoundException("Запрос с id " + id + " не найден.")
-        );
+        return requestRepository.getExistingRequest(id);
     }
 
     private void fillRequestsWithItems(ItemRequestDto request) {
-        List<ItemDtoInRequest> items = itemServiceImpl.getItemsByRequestId(request.getId());
+        List<ItemDtoInRequest> items = itemRepository.getItemsByRequestId(request.getId());
 
         if (!items.isEmpty()) {
             request.setItems(items);
