@@ -7,17 +7,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.service.BookingServiceImpl;
-import ru.practicum.shareit.core.exception.exceptions.*;
-import ru.practicum.shareit.item.dto.*;
-import ru.practicum.shareit.item.model.*;
-import ru.practicum.shareit.item.storage.*;
+import ru.practicum.shareit.core.exception.exceptions.UserNotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentMapper;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoInRequest;
+import ru.practicum.shareit.item.model.Comment;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.storage.CommentRepository;
+import ru.practicum.shareit.item.storage.ItemRepository;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,8 +27,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.item.dto.CommentMapper.*;
-import static ru.practicum.shareit.item.dto.ItemMapper.*;
+import static ru.practicum.shareit.item.dto.CommentMapper.toComment;
+import static ru.practicum.shareit.item.dto.CommentMapper.toCommentDto;
+import static ru.practicum.shareit.item.dto.ItemMapper.toItem;
+import static ru.practicum.shareit.item.dto.ItemMapper.toItemDto;
 
 @Service
 public class ItemServiceImpl implements ItemService {
