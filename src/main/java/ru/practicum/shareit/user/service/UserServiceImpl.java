@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto findById(Long id) {
-        return toUserDto(getExistingUser(id));
+        return toUserDto(userRepository.getExistingUser(id));
     }
 
     @Transactional
@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto update(UserDto dto, Long userId) {
-        User updated = getExistingUser(userId);
+        User updated = userRepository.getExistingUser(userId);
         updateName(updated, dto.getName());
         updateEmail(updated, dto.getEmail());
         userRepository.save(updated);
@@ -54,12 +54,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void delete(Long id) {
-        getExistingUser(id);
+        userRepository.getExistingUser(id);
         userRepository.deleteById(id);
-    }
-
-    public User getExistingUser(long id) {
-        return userRepository.getExistingUser(id);
     }
 
     private void updateName(User user, String newName) {

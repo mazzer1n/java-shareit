@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.core.exception.exceptions.PaginationBadRequestException;
 import ru.practicum.shareit.core.exception.exceptions.RequestNotFoundException;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.RequestMapper;
@@ -21,6 +22,7 @@ import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
@@ -92,34 +94,34 @@ public class ItemRequestServiceTest {
         expectedRequest.setRequester(null);
         List<ItemRequest> requests = List.of(expectedRequest);
         when(requestRepository.findByRequesterId(1L, Sort.by("created").descending()))
-            .thenReturn(requests);
+                .thenReturn(requests);
 
         List<ItemRequest> actualRequests = requestService.findAll(userId)
-            .stream()
-            .map(RequestMapper::toRequest)
-            .collect(Collectors.toList());
+                .stream()
+                .map(RequestMapper::toRequest)
+                .collect(Collectors.toList());
 
         assertEquals(requests, actualRequests);
         assertEquals(1, actualRequests.size());
         verify(requestRepository, times(1))
-            .findByRequesterId(userId, Sort.by("created").descending());
+                .findByRequesterId(userId, Sort.by("created").descending());
     }
 
     @Test
     void findRequests_whenEmptyList_thenEmptyListReturned() {
         List<ItemRequest> requests = List.of();
         when(requestRepository.findByRequesterId(1L, Sort.by("created").descending()))
-            .thenReturn(requests);
+                .thenReturn(requests);
 
         List<ItemRequest> actualRequests = requestService.findAll(userId)
-            .stream()
-            .map(RequestMapper::toRequest)
-            .collect(Collectors.toList());
+                .stream()
+                .map(RequestMapper::toRequest)
+                .collect(Collectors.toList());
 
         assertEquals(requests, actualRequests);
         assertTrue(actualRequests.isEmpty());
         verify(requestRepository, times(1))
-            .findByRequesterId(userId, Sort.by("created").descending());
+                .findByRequesterId(userId, Sort.by("created").descending());
     }
 
     @Test
@@ -130,9 +132,9 @@ public class ItemRequestServiceTest {
         when(requestRepository.findByRequesterIdIsNot(1L, pageable)).thenReturn(requests);
 
         List<ItemRequest> actualRequests = requestService.findAllFromOtherUsers(userId, 0, 10)
-            .stream()
-            .map(RequestMapper::toRequest)
-            .collect(Collectors.toList());
+                .stream()
+                .map(RequestMapper::toRequest)
+                .collect(Collectors.toList());
 
         assertEquals(requests, actualRequests);
         assertEquals(1, actualRequests.size());
@@ -142,6 +144,6 @@ public class ItemRequestServiceTest {
     @Test
     void findRequestsFromOtherUsers_whenIncorrectPagination_thenExceptionReturned() {
         assertThrows(PaginationBadRequestException.class,
-            () -> requestService.findAllFromOtherUsers(2L, -1, 0));
+                () -> requestService.findAllFromOtherUsers(2L, -1, 0));
     }
 }

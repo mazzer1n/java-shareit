@@ -36,7 +36,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
                 .findAny().isEmpty();
     }
 
-    default List<ItemDtoInRequest> getItemsByRequestId(long id) {
+    default List<ItemDtoInRequest> getItemsByRequestId(Long id) {
         return findByRequestId(id)
                 .stream().map(ItemMapper::toItemDtoInRequest)
                 .collect(Collectors.toList());

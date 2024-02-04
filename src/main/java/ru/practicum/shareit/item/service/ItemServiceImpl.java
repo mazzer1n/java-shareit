@@ -152,14 +152,6 @@ public class ItemServiceImpl implements ItemService {
         return result;
     }
 
-    public List<ItemDtoInRequest> getItemsByRequestId(long id) {
-        return itemRepository.getItemsByRequestId(id);
-    }
-
-    public boolean hasUserZeroItems(long userId) {
-        return itemRepository.hasUserZeroItems(userId);
-    }
-
     @Transactional
     @Override
     public CommentDto saveComment(Long userId, Long itemId, CommentDto dto) {

@@ -48,7 +48,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestDto findById(Long userId, Long requestId) {
         userRepository.getExistingUser(userId);
-        ItemRequest request = getExistingRequest(requestId);
+        ItemRequest request = requestRepository.getExistingRequest(requestId);
         ItemRequestDto result = toRequestDto(request);
         fillRequestsWithItems(result);
 
@@ -85,10 +85,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         }
 
         return result;
-    }
-
-    public ItemRequest getExistingRequest(long id) {
-        return requestRepository.getExistingRequest(id);
     }
 
     private void fillRequestsWithItems(ItemRequestDto request) {

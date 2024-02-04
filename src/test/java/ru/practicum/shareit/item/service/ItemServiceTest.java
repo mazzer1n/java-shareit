@@ -286,7 +286,7 @@ public class ItemServiceTest {
         List<ItemDtoInRequest> expected = List.of(ItemMapper.toItemDtoInRequest(expectedItem));
         when(itemRepository.findByRequestId(1L)).thenReturn(List.of(expectedItem));
 
-        List<ItemDtoInRequest> actual = itemService.getItemsByRequestId(1L);
+        List<ItemDtoInRequest> actual = itemRepository.getItemsByRequestId(1L);
 
         assertEquals(actual.size(), expected.size());
         assertEquals(actual.get(0).getDescription(), expected.get(0).getDescription());
@@ -299,7 +299,7 @@ public class ItemServiceTest {
     void hasUserZeroItems_whenZero_thenReturnTrue() {
         List<Item> items = List.of();
         when(itemRepository.findAll()).thenReturn(items);
-        boolean actual = itemService.hasUserZeroItems(2L);
+        boolean actual = itemRepository.hasUserZeroItems(2L);
 
         assertTrue(actual);
     }

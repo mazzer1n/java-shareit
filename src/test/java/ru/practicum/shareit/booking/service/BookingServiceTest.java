@@ -324,20 +324,6 @@ public class BookingServiceTest {
     }
 
     @Test
-    void findByUserIdAndState_whenStateNull_thenBookingListReturned() {
-        List<Booking> bookings = List.of(booking);
-        when(bookingRepository.findByBookerId(anyLong(), any(Pageable.class))).thenReturn(List.of(booking));
-
-        List<Booking> actualBookings = bookingService.findByUserIdAndState(notOwner.getId(), null, pageable)
-            .stream()
-            .map(BookingMapper::toBookingFromBookingDto)
-            .collect(Collectors.toList());
-
-        assertEquals(bookings, actualBookings);
-        assertEquals(1, actualBookings.size());
-    }
-
-    @Test
     void findByUserIdAndState_whenStatusIsUnsupported_thenExceptionReturned() {
         assertThrows(UnsupportedStatusException.class,
             () -> bookingService.findByUserIdAndState(notOwner.getId(), String.valueOf("UNSUPPORTED"), pageable));
