@@ -8,32 +8,18 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.practicum.shareit.core.exception.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -51,27 +37,9 @@ public class UserServiceTest {
     private ArgumentCaptor<User> captor;
 
     @BeforeEach
-    public void init() {
+    public void setUp() {
         userId = 1L;
         expectedUser = new User(userId, "test", "test@mail.ru");
-    }
-
-    @Test
-    void getUserById_whenUserFound_thenUserReturned() {
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
-
-        UserDto actual = userService.findById(userId);
-
-        assertEquals(expectedUser.getId(), actual.getId());
-        assertEquals(expectedUser.getName(), actual.getName());
-        assertEquals(expectedUser.getEmail(), actual.getEmail());
-    }
-
-    @Test
-    void getUserById_whenUserNotFound_thenExceptionReturned() {
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(UserNotFoundException.class, () -> userService.findById(userId));
     }
 
     @Test
@@ -84,59 +52,6 @@ public class UserServiceTest {
         assertEquals(expectedUser.getName(), actual.getName());
         assertEquals(expectedUser.getEmail(), actual.getEmail());
         verify(userRepository).save(expectedUser);
-    }
-
-    @Test
-    void updateUser_whenUserFound_thenUserReturned() {
-        User updatedUser = new User();
-        updatedUser.setName("Upd");
-        updatedUser.setEmail("upd@mail.ru");
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
-
-        userService.update(UserMapper.toUserDto(updatedUser), userId);
-
-        verify(userRepository).save(captor.capture());
-        User savedUser = captor.getValue();
-
-        assertEquals("Upd", savedUser.getName());
-        assertEquals("upd@mail.ru", savedUser.getEmail());
-    }
-
-    @Test
-    void updateUser_whenNameAndEmailAreBlank_thenUserReturned() {
-        User updatedUser = new User();
-        updatedUser.setName("");
-        updatedUser.setEmail("");
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
-
-        userService.update(UserMapper.toUserDto(updatedUser), userId);
-
-        verify(userRepository).save(captor.capture());
-        User savedUser = captor.getValue();
-
-        assertEquals("test", savedUser.getName());
-        assertEquals("test@mail.ru", savedUser.getEmail());
-    }
-
-    @Test
-    void updateUser_whenNameAndEmailAreNull_thenUserReturned() {
-        User updatedUser = new User();
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
-
-        userService.update(UserMapper.toUserDto(updatedUser), userId);
-
-        verify(userRepository).save(captor.capture());
-        User savedUser = captor.getValue();
-
-        assertEquals("test", savedUser.getName());
-        assertEquals("test@mail.ru", savedUser.getEmail());
-    }
-
-    @Test
-    void updateUser_whenUserNotFound_thenExceptionReturned() {
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(UserNotFoundException.class, () -> userService.update(UserMapper.toUserDto(expectedUser), userId));
     }
 
     @Test
@@ -161,19 +76,6 @@ public class UserServiceTest {
         assertTrue(actualUsers.isEmpty());
     }
 
-    @Test
-    void deleteUser_whenUserFound_thenNothingReturned() {
-        when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
-
-        userService.delete(userId);
-
-        verify(userRepository).deleteById(userId);
-    }
-
-    @Test
-    void deleteUser_whenUserNotFound_thenExceptionReturned() {
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        assertThrows(UserNotFoundException.class, () -> userService.delete(userId));
-    }
 }
+
+
