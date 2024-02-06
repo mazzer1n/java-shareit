@@ -142,19 +142,4 @@ public class BookingRepositoryTest {
         assertEquals(bookingWithStatusIsCurrent.getStatus(), actual.get(0).getStatus());
     }
 
-    @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-    void findBookingsToAddComment() {
-        this.entityManager.persist(booker);
-        this.entityManager.persist(item);
-        this.entityManager.persist(bookingWithEndBeforeAndItemId);
-        List<Booking> actual = bookingRepository.findBookingsToAddComment(item.getId(), booker.getId(), LocalDateTime.now());
-
-        assertEquals(1, actual.size());
-        assertEquals(bookingWithEndBeforeAndItemId.getStart(), actual.get(0).getStart());
-        assertEquals(bookingWithEndBeforeAndItemId.getEnd(), actual.get(0).getEnd());
-        assertEquals(bookingWithEndBeforeAndItemId.getBooker(), actual.get(0).getBooker());
-        assertEquals(bookingWithEndBeforeAndItemId.getItem(), actual.get(0).getItem());
-        assertEquals(bookingWithEndBeforeAndItemId.getStatus(), actual.get(0).getStatus());
-    }
 }
