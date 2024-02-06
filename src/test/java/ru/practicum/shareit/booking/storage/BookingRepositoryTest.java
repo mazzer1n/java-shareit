@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.model.Item;
@@ -17,9 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static ru.practicum.shareit.booking.controller.BookingController.SORT;
 import static ru.practicum.shareit.booking.model.Status.APPROVED;
 import static ru.practicum.shareit.booking.model.Status.WAITING;
-import static ru.practicum.shareit.booking.controller.BookingController.SORT;
 
 @DataJpaTest
 public class BookingRepositoryTest {
@@ -79,7 +78,6 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void findByBookerIdCurrent() {
         this.entityManager.persist(booker);
         this.entityManager.persist(item);
@@ -95,7 +93,6 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void findBookingByItemIdAndStartBefore() {
         this.entityManager.persist(booker);
         this.entityManager.persist(item);
@@ -111,7 +108,6 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void findBookingByItemIdAndStartAfter() {
         this.entityManager.persist(booker);
         this.entityManager.persist(item);
@@ -127,7 +123,6 @@ public class BookingRepositoryTest {
     }
 
     @Test
-    @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
     void findBookingsByItemOwnerCurrent() {
         this.entityManager.persist(booker);
         this.entityManager.persist(item);
@@ -142,4 +137,18 @@ public class BookingRepositoryTest {
         assertEquals(bookingWithStatusIsCurrent.getStatus(), actual.get(0).getStatus());
     }
 
+    @Test
+    void findBookingsToAddComment() {
+        this.entityManager.persist(booker);
+        this.entityManager.persist(item);
+        this.entityManager.persist(bookingWithEndBeforeAndItemId);
+        List<Booking> actual = bookingRepository.findBookingsToAddComment(item.getId(), booker.getId(), LocalDateTime.now());
+
+        assertEquals(1, actual.size());
+        assertEquals(bookingWithEndBeforeAndItemId.getStart(), actual.get(0).getStart());
+        assertEquals(bookingWithEndBeforeAndItemId.getEnd(), actual.get(0).getEnd());
+        assertEquals(bookingWithEndBeforeAndItemId.getBooker(), actual.get(0).getBooker());
+        assertEquals(bookingWithEndBeforeAndItemId.getItem(), actual.get(0).getItem());
+        assertEquals(bookingWithEndBeforeAndItemId.getStatus(), actual.get(0).getStatus());
+    }
 }
