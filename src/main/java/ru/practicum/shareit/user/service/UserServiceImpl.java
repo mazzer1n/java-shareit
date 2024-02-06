@@ -64,6 +64,7 @@ public class UserServiceImpl implements UserService {
             user.setName(newName);
         }
     }
+
     public User getExistingUser(long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new UserNotFoundException("Пользователь с id " + id + " не найден.")
