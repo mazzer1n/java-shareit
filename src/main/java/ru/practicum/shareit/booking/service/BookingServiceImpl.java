@@ -93,6 +93,7 @@ public class BookingServiceImpl implements BookingService {
     public Collection<BookingDto> findByUserIdAndState(Long userId, String state, Pageable pageable) {
         userService.getExistingUser(userId);
         hasUserZeroItems(userId);
+        checkUserBookingState(state);
 
         List<Booking> bookings;
 
@@ -129,6 +130,7 @@ public class BookingServiceImpl implements BookingService {
     public Collection<BookingDto> findBookingsByItemOwnerId(Long userId, String state, Pageable pageable) {
         userService.getExistingUser(userId);
         hasUserZeroItems(userId);
+        checkUserBookingState(state);
 
         List<Booking> bookings;
 

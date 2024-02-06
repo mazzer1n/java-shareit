@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -19,6 +20,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -169,6 +171,24 @@ public class BookingControllerTest {
     }
 
     @Test
+    public void findByUserIdAndState_whenInvoked_thenStatus200andReturnBookingList() throws Exception {
+        List<BookingDto> expectedBookings = List.of(bookingDto);
+
+        when(bookingService.findByUserIdAndState(anyLong(), anyString(), any(Pageable.class)))
+                .thenReturn(expectedBookings);
+
+        mockMvc.perform(
+                        get("/bookings")
+                                .header("X-Sharer-User-Id", "1")
+                                .param("state", "ALL"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(bookingDto))));
+
+        verify(bookingService, times(1)).findByUserIdAndState(anyLong(), anyString(), any(Pageable.class));
+    }
+
+
+    @Test
     public void findBooking_whenExist_thenStatus200andBookingReturned() throws Exception {
         when(bookingService.findById(anyLong(), anyLong())).thenReturn(bookingDto);
 
@@ -188,6 +208,21 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/{bookingId}", 1L)
                 .header("X-Sharer-User-Id", 1))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findBookingsByItemOwnerId_whenInvoked_thenStatus200andReturnBookingList() throws Exception {
+        List<BookingDto> expectedBookings = List.of(bookingDto);
+        when(bookingService.findBookingsByItemOwnerId(anyLong(), anyString(), any(Pageable.class))).thenReturn(expectedBookings);
+
+        mockMvc.perform(
+                        get("/bookings/owner")
+                                .header("X-Sharer-User-Id", 1)
+                                .param("state", "ALL"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(bookingDto))));
+
+        verify(bookingService, times(1)).findBookingsByItemOwnerId(anyLong(), anyString(), any(Pageable.class));
     }
 
     @Test

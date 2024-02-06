@@ -28,10 +28,9 @@ public class BookingController {
                                                   @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
                                                   @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                   @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        String state = bookingService.checkUserBookingState(stateParam);
         PaginationValidator.validatePagination(from, size);
         Pageable pageable = PageRequest.of(from / size, size, SORT);
-        Collection<BookingDto> bookingDtos = bookingService.findBookingsByItemOwnerId(userId, state, pageable);
+        Collection<BookingDto> bookingDtos = bookingService.findBookingsByItemOwnerId(userId, stateParam, pageable);
         log.info("All bookings by user id - {}: size - {}", userId, bookingDtos.size());
         return bookingDtos;
     }
@@ -41,11 +40,10 @@ public class BookingController {
                                                        @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
                                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        String state = bookingService.checkUserBookingState(stateParam);
         PaginationValidator.validatePagination(from, size);
         Pageable pageable = PageRequest.of(from / size, size, SORT);
-        Collection<BookingDto> bookingDtos = bookingService.findByUserIdAndState(userId, state, pageable);
-        log.info("All bookings by user id - {} and state - {}: size - {}", userId, state, bookingDtos.size());
+        Collection<BookingDto> bookingDtos = bookingService.findByUserIdAndState(userId, stateParam, pageable);
+        log.info("All bookings by user id - {} and state - {}: size - {}", userId, stateParam, bookingDtos.size());
         return bookingDtos;
     }
 
