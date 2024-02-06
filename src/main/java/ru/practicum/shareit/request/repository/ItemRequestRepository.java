@@ -15,9 +15,4 @@ public interface ItemRequestRepository extends JpaRepository<ItemRequest, Long> 
 
     List<ItemRequest> findByRequesterIdIsNot(Long userId, Pageable pageable);
 
-    default ItemRequest getExistingRequest(Long id) {
-        return findById(id).orElseThrow(
-                () -> new RequestNotFoundException("Запрос с id " + id + " не найден.")
-        );
-    }
 }

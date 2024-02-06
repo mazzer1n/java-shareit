@@ -6,14 +6,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.core.exception.exceptions.RequestNotFoundException;
 import ru.practicum.shareit.core.validation.PaginationValidator;
 import ru.practicum.shareit.item.dto.ItemDtoInRequest;
-import ru.practicum.shareit.item.storage.ItemRepository;
-import ru.practicum.shareit.request.dto.*;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
+import ru.practicum.shareit.request.dto.RequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,20 +23,21 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.request.dto.RequestMapper.*;
+import static ru.practicum.shareit.request.dto.RequestMapper.toRequest;
+import static ru.practicum.shareit.request.dto.RequestMapper.toRequestDto;
 
 @Service
 @RequiredArgsConstructor
 public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final ItemRepository itemRepository;
+    private final UserServiceImpl userService;
+    private final ItemServiceImpl itemService;
     public static final Sort SORT = Sort.by("created").descending();
 
     @Transactional
     @Override
     public ItemRequestDto save(Long userId, ItemRequestDto dto) {
-        User user = userRepository.getExistingUser(userId);
+        User user = userService.getExistingUser(userId);
 
         ItemRequest request = toRequest(dto);
         request.setRequester(user);
@@ -47,8 +50,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public ItemRequestDto findById(Long userId, Long requestId) {
-        userRepository.getExistingUser(userId);
-        ItemRequest request = requestRepository.getExistingRequest(requestId);
+        userService.getExistingUser(userId);
+        ItemRequest request = getExistingRequest(requestId);
         ItemRequestDto result = toRequestDto(request);
         fillRequestsWithItems(result);
 
@@ -58,7 +61,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemRequestDto> findAll(Long userId) {
-        userRepository.getExistingUser(userId);
+        userService.getExistingUser(userId);
         List<ItemRequest> requests = requestRepository.findByRequesterId(userId, SORT);
 
         return mapListToDtoList(requests);
@@ -68,7 +71,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public Collection<ItemRequestDto> findAllFromOtherUsers(Long userId, Integer from, Integer size) {
         PaginationValidator.validatePagination(from, size);
-        userRepository.getExistingUser(userId);
+        userService.getExistingUser(userId);
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         List<ItemRequest> requests = requestRepository.findByRequesterIdIsNot(userId, pageable);
 
@@ -88,12 +91,18 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     private void fillRequestsWithItems(ItemRequestDto request) {
-        List<ItemDtoInRequest> items = itemRepository.getItemsByRequestId(request.getId());
+        List<ItemDtoInRequest> items = itemService.getItemsByRequestId(request.getId());
 
         if (!items.isEmpty()) {
             request.setItems(items);
         } else {
             request.setItems(new ArrayList<>());
         }
+    }
+
+    public ItemRequest getExistingRequest(long id) {
+        return requestRepository.findById(id).orElseThrow(
+                () -> new RequestNotFoundException("Запрос с id " + id + " не найден.")
+        );
     }
 }

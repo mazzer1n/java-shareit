@@ -4,14 +4,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.booking.model.*;
-import ru.practicum.shareit.core.exception.exceptions.CommentBadRequestException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static ru.practicum.shareit.booking.dto.BookingMapper.toShortBookingDto;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -62,28 +59,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "and b.end < ?3")
     List<Booking> findBookingsToAddComment(Long itemId, Long userId, LocalDateTime now);
 
-    default void fillItemWithBookings(ItemDto result) {
-        LocalDateTime now = LocalDateTime.now();
-        findBookingByItemIdAndStartBefore(result.getId(), now)
-                .stream()
-                .findFirst().ifPresent(lastBooking -> result.setLastBooking(toShortBookingDto(lastBooking)));
-
-        findBookingByItemIdAndStartAfter(result.getId(), now)
-                .stream()
-                .findFirst().ifPresent(nextBooking -> result.setNextBooking(toShortBookingDto(nextBooking)));
-
-        if (result.getLastBooking() == null) {
-            result.setNextBooking(null);
-        }
-    }
-
-    default void validateBookingsToAddComment(Long userId, Long itemId) {
-        List<Booking> previousBookings = findBookingsToAddComment(itemId, userId, LocalDateTime.now());
-
-        if (previousBookings.isEmpty()) {
-            throw new CommentBadRequestException(
-                    "Пользователь может оставить комментарий только на вещь, которую ранее использовал."
-            );
-        }
-    }
 }

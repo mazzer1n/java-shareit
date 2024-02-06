@@ -17,9 +17,9 @@ import ru.practicum.shareit.core.exception.exceptions.CommentBadRequestException
 import ru.practicum.shareit.core.exception.exceptions.UnsupportedStatusException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -33,15 +33,15 @@ import static ru.practicum.shareit.booking.model.Status.*;
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final ItemServiceImpl itemService;
+    private final UserServiceImpl userService;
     public static final Sort SORT = Sort.by("start").descending();
 
     @Transactional
     @Override
     public BookingDto save(Long userId, ShortBookingDto dto) {
-        Item item = itemRepository.getExistingItem(dto.getItemId());
-        User booker = userRepository.getExistingUser(userId);
+        Item item = itemService.getExistingItem(dto.getItemId());
+        User booker = userService.getExistingUser(userId);
 
         if (item.getOwner().equals(userId)) {
             throw new BookingNotFoundException("Вещь не может быть забронирована ее владельцем.");
@@ -61,7 +61,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto approve(Long userId, Long bookingId, Boolean approved) {
         Booking booking = getExistingBooking(bookingId);
-        Item item = itemRepository.getExistingItem(booking.getItem().getId());
+        Item item = itemService.getExistingItem(booking.getItem().getId());
 
         if (!item.getOwner().equals(userId)) {
             throw new BookingNotFoundException("Запрос может быть выполнен только владельцем вещи.");
@@ -81,7 +81,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public BookingDto findById(Long id, Long userId) {
-        userRepository.getExistingUser(userId);
+        userService.getExistingUser(userId);
         Booking booking = getExistingBooking(id);
         validateRequester(booking, userId);
 
@@ -91,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public Collection<BookingDto> findByUserIdAndState(Long userId, String state, Pageable pageable) {
-        userRepository.getExistingUser(userId);
+        userService.getExistingUser(userId);
         hasUserZeroItems(userId);
 
         List<Booking> bookings;
@@ -127,7 +127,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public Collection<BookingDto> findBookingsByItemOwnerId(Long userId, String state, Pageable pageable) {
-        userRepository.getExistingUser(userId);
+        userService.getExistingUser(userId);
         hasUserZeroItems(userId);
 
         List<Booking> bookings;
@@ -177,7 +177,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     public void hasUserZeroItems(long userId) {
-        if (itemRepository.hasUserZeroItems(userId)) {
+        if (itemService.hasUserZeroItems(userId)) {
             throw new BookingBadRequestException("Этот запрос имеет смысл для владельца хотя бы одной вещи. ");
         }
     }

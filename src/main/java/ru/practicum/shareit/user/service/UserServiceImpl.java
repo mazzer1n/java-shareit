@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.core.exception.exceptions.UserNotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true)
     @Override
     public UserDto findById(Long id) {
-        return toUserDto(userRepository.getExistingUser(id));
+        return toUserDto(getExistingUser(id));
     }
 
     @Transactional
@@ -43,7 +44,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDto update(UserDto dto, Long userId) {
-        User updated = userRepository.getExistingUser(userId);
+        User updated = getExistingUser(userId);
         updateName(updated, dto.getName());
         updateEmail(updated, dto.getEmail());
         userRepository.save(updated);
@@ -54,7 +55,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void delete(Long id) {
-        userRepository.getExistingUser(id);
+        getExistingUser(id);
         userRepository.deleteById(id);
     }
 
@@ -62,6 +63,11 @@ public class UserServiceImpl implements UserService {
         if (newName != null && !newName.isBlank()) {
             user.setName(newName);
         }
+    }
+    public User getExistingUser(long id) {
+        return userRepository.findById(id).orElseThrow(
+                () -> new UserNotFoundException("Пользователь с id " + id + " не найден.")
+        );
     }
 
     private void updateEmail(User user, String newEmail) {
