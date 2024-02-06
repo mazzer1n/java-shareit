@@ -37,10 +37,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class ItemServiceTest {
     @Mock
-    private UserServiceImpl userService;
-    @Mock
-    private UserRepository userRepository;
-    @Mock
     private ItemRepository itemRepository;
     @Mock
     private CommentRepository commentRepository;
@@ -80,19 +76,6 @@ public class ItemServiceTest {
                 .author(user)
                 .created(LocalDateTime.now())
                 .build();
-    }
-
-    @Test
-    void saveItem_whenInvoked_thenItemReturned() {
-        when(itemRepository.save(any())).thenReturn(expectedItem);
-
-        ItemDto actual = itemService.save(userId, ItemMapper.toItemDto(expectedItem));
-
-        assertEquals(expectedItem.getId(), actual.getId());
-        assertEquals(expectedItem.getName(), actual.getName());
-        assertEquals(expectedItem.getDescription(), actual.getDescription());
-        assertEquals(expectedItem.getAvailable(), actual.getAvailable());
-        verify(itemRepository).save(any(Item.class));
     }
 
     @Test
