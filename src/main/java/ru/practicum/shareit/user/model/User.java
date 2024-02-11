@@ -5,8 +5,9 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 
-@Data
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
