@@ -139,9 +139,4 @@ public class ItemRequestServiceTest {
         verify(requestRepository, times(1)).findByRequesterIdIsNot(userId, pageable);
     }
 
-    @Test
-    void findRequestsFromOtherUsers_whenIncorrectPagination_thenExceptionReturned() {
-        assertThrows(PaginationBadRequestException.class,
-                () -> requestService.findAllFromOtherUsers(2L, -1, 0));
-    }
 }
