@@ -1,10 +1,10 @@
 package ru.practicum.shareit.booking.service;
 
-import org.springframework.stereotype.Component;
+import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.ShortBookingDto;
 import ru.practicum.shareit.core.exception.exceptions.BookingBadRequestException;
 
-@Component
+@UtilityClass
 public class StartAndEndValidator {
     public void validate(ShortBookingDto dto) throws BookingBadRequestException {
         if (dto.getEnd().isBefore(dto.getStart())) {
