@@ -35,6 +35,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemServiceImpl itemService;
     private final UserServiceImpl userService;
+    private final StartAndEndValidator startAndEndValidator;
     public static final Sort SORT = Sort.by("start").descending();
 
     @Transactional
@@ -51,6 +52,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingBadRequestException("В данный момент товар недоступен для бронирования.");
         }
 
+        startAndEndValidator.validate(dto);
         Booking booking = toBooking(dto, item, booker);
         booking.setStatus(WAITING);
 
