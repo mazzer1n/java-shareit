@@ -6,13 +6,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.dto.*;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.ShortBookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.core.validation.PaginationValidator;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
@@ -26,9 +23,8 @@ public class BookingController {
     @GetMapping("/owner")
     public Collection<BookingDto> findAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
-                                                  @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                  @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        PaginationValidator.validatePagination(from, size);
+                                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         Collection<BookingDto> bookingDtos = bookingService.findBookingsByItemOwnerId(userId, stateParam, pageable);
         log.info("All bookings by user id - {}: size - {}", userId, bookingDtos.size());
@@ -38,9 +34,8 @@ public class BookingController {
     @GetMapping
     public Collection<BookingDto> findByUserIdAndState(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                        @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
-                                                       @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                       @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        PaginationValidator.validatePagination(from, size);
+                                                       @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                       @RequestParam(name = "size", defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         Collection<BookingDto> bookingDtos = bookingService.findByUserIdAndState(userId, stateParam, pageable);
         log.info("All bookings by user id - {} and state - {}: size - {}", userId, stateParam, bookingDtos.size());
@@ -55,7 +50,7 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDto save(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ShortBookingDto dto) {
+    public BookingDto save(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ShortBookingDto dto) {
         BookingDto bookingDto = bookingService.save(userId, dto);
         log.info("Save booking - {}", bookingDto);
         return bookingDto;

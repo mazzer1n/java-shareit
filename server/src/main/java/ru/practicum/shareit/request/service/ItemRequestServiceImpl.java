@@ -7,7 +7,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.core.exception.exceptions.RequestNotFoundException;
-import ru.practicum.shareit.core.validation.PaginationValidator;
 import ru.practicum.shareit.item.dto.ItemDtoInRequest;
 import ru.practicum.shareit.item.service.ItemServiceImpl;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -70,7 +69,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemRequestDto> findAllFromOtherUsers(Long userId, Integer from, Integer size) {
-        PaginationValidator.validatePagination(from, size);
         userService.getExistingUser(userId);
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         List<ItemRequest> requests = requestRepository.findByRequesterIdIsNot(userId, pageable);

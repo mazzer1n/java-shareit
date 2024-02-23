@@ -6,9 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
 @RestController
@@ -19,7 +16,7 @@ public class ItemRequestController {
     private final ItemRequestService requestService;
 
     @PostMapping
-    public ItemRequestDto save(@RequestHeader("X-Sharer-User-Id") Long userId, @Valid @RequestBody ItemRequestDto dto) {
+    public ItemRequestDto save(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemRequestDto dto) {
         ItemRequestDto itemRequestDto = requestService.save(userId, dto);
         log.info("Save item request - {}", itemRequestDto);
         return itemRequestDto;
@@ -41,8 +38,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public Collection<ItemRequestDto> findAllFromOtherUsers(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                            @PositiveOrZero @RequestParam(defaultValue = "0", required = false) Integer from,
-                                                            @Positive @RequestParam(defaultValue = "10", required = false) Integer size) {
+                                                            @RequestParam(defaultValue = "0", required = false) Integer from,
+                                                            @RequestParam(defaultValue = "10", required = false) Integer size) {
         Collection<ItemRequestDto> itemRequestDtos = requestService.findAllFromOtherUsers(userId, from, size);
         log.info("Find all items request from user id - {}: size - {}", userId, itemRequestDtos);
         return itemRequestDtos;
