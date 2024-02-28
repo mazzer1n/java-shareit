@@ -23,8 +23,8 @@ public class BookingController {
     @GetMapping("/owner")
     public Collection<BookingDto> findAllByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
-                                                  @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                  @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                                  @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                  @RequestParam(required = false, defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         Collection<BookingDto> bookingDtos = bookingService.findBookingsByItemOwnerId(userId, stateParam, pageable);
         log.info("All bookings by user id - {}: size - {}", userId, bookingDtos.size());
@@ -34,8 +34,8 @@ public class BookingController {
     @GetMapping
     public Collection<BookingDto> findByUserIdAndState(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                        @RequestParam(name = "state", defaultValue = "ALL") String stateParam,
-                                                       @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                                       @RequestParam(name = "size", defaultValue = "10") Integer size) {
+                                                       @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                       @RequestParam(required = false, defaultValue = "10") Integer size) {
         Pageable pageable = PageRequest.of(from / size, size, SORT);
         Collection<BookingDto> bookingDtos = bookingService.findByUserIdAndState(userId, stateParam, pageable);
         log.info("All bookings by user id - {} and state - {}: size - {}", userId, stateParam, bookingDtos.size());
