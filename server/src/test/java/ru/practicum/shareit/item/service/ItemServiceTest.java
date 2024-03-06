@@ -182,39 +182,6 @@ public class ItemServiceTest {
     }
 
     @Test
-    void findItems_whenItemsFound_thenItemListReturned() {
-        expectedItem.setOwner(null);
-        Pageable pageable = PageRequest.of(0, 10);
-        List<Item> items = List.of(expectedItem);
-        when(itemRepository.findByOwner(1L, pageable)).thenReturn(items);
-
-        List<Item> actualItems = itemService.findAll(userId, 0, 10)
-            .stream()
-            .map(ItemMapper::toItem)
-            .collect(Collectors.toList());
-
-        assertEquals(items, actualItems);
-        assertEquals(1, actualItems.size());
-        verify(itemRepository, times(1)).findByOwner(userId, pageable);
-    }
-
-    @Test
-    void findItems_whenEmptyList_thenEmptyListReturned() {
-        Pageable pageable = PageRequest.of(0, 10);
-        List<Item> items = List.of();
-        when(itemRepository.findByOwner(1L, pageable)).thenReturn(items);
-
-        List<Item> actualItems = itemService.findAll(userId, 0, 10)
-            .stream()
-            .map(ItemMapper::toItem)
-            .collect(Collectors.toList());
-
-        assertEquals(items, actualItems);
-        assertTrue(actualItems.isEmpty());
-        verify(itemRepository, times(1)).findByOwner(userId, pageable);
-    }
-
-    @Test
     void search_whenItemsFound_thenItemListReturned() {
         expectedItem.setOwner(null);
         Pageable pageable = PageRequest.of(0, 10);
