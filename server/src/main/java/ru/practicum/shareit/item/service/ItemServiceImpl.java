@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
@@ -22,6 +23,7 @@ import ru.practicum.shareit.user.service.UserServiceImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -97,6 +99,7 @@ public class ItemServiceImpl implements ItemService {
         Pageable pageable = PageRequest.of(from / size, size);
         List<ItemDto> result = new ArrayList<>();
         List<Item> items = itemRepository.findByOwner(userId, pageable);
+        items.sort(Comparator.comparing(Item::getId));
 
         for (Item item : items) {
             result.add(fillItemWithCommentsAndBookings(item));
